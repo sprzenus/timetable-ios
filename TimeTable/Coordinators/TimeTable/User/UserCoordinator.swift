@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SwiftUI
 
 protocol UserCoordinatorDelegate: class {
    func userProfileDidLogoutUser()
@@ -51,23 +52,26 @@ class UserCoordinator: BaseNavigationCoordinator, BaseTabBarCoordinatorType {
     // MARK: - CoordinatorType
     override func start(finishCompletion: (() -> Void)?) {
         self.runMainFlow()
-        navigationController.setNavigationBarHidden(true, animated: false)
+        navigationController.setNavigationBarHidden(false, animated: false)
+        navigationController.navigationBar.prefersLargeTitles = true
         super.start(finishCompletion: finishCompletion)
     }
     
     // MARK: - Private
     private func runMainFlow() {
-        let controller: UserProfileViewControllerable? = storyboardsManager.controller(storyboard: .user, controllerIdentifier: .initial)
-        let viewModel = UserProfileViewModel(userInterface: controller,
-                                             coordinator: self,
+        let viewModel = UserProfileViewModel(coordinator: self,
                                              apiClient: apiClient,
                                              accessService: accessService,
                                              coreDataStack: coreDataStack,
                                              errorHandler: errorHandler)
-        controller?.configure(viewModel: viewModel)
-        if let controller = controller {
-            navigationController.pushViewController(controller, animated: false)
-        }
+        let view = UserProfileView(viewModel: viewModel)
+        let controller = UIHostingController(rootView: view)
+        self.navigationController.setViewControllers([controller], animated: true)
+//        let controller: UserProfileViewControllerable? = storyboardsManager.controller(storyboard: .user, controllerIdentifier: .initial)
+//        controller?.configure(viewModel: viewModel)
+//        if let controller = controller {
+//            navigationController.pushViewController(controller, animated: false)
+//        }
     }
 }
 
